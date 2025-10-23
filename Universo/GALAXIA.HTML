@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galaxia Romántica Deluxe</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 50%, #0a0013, #000);
+    height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    opacity: 0;
+    animation: fadeInBody 3s ease forwards;
+  }
+
+  @keyframes fadeInBody {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  /* 💖 Corazones brillantes */
+  .heart {
+    position: absolute;
+    font-size: 12px;
+    color: #ff66cc;
+    text-shadow: 0 0 8px #ff66cc, 0 0 16px #ff33aa, 0 0 25px #ff00ff;
+    opacity: 0;
+    animation: fadeHeart 3s ease-in-out forwards, heartbeat 1.5s infinite ease-in-out;
+  }
+
+  @keyframes fadeHeart {
+    0% { opacity: 0; transform: scale(0.5); }
+    25% { opacity: 1; transform: scale(1.1); }
+    75% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.8); }
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.25); }
+  }
+
+  /* ✨ Frases románticas */
+  .phrase {
+    position: absolute;
+    font-size: 1.6em;
+    color: #ffccff;
+    text-shadow: 0 0 15px #ff66ff, 0 0 40px #cc33ff;
+    opacity: 0;
+    animation: fadeInOut 7s ease-in-out forwards, twinkle 1.5s infinite alternate, colorShift 5s infinite linear;
+  }
+
+  @keyframes fadeInOut {
+    0% { opacity: 0; transform: scale(0.9); }
+    20% { opacity: 1; transform: scale(1); }
+    80% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.1); }
+  }
+
+  @keyframes twinkle {
+    0% { filter: brightness(1); }
+    100% { filter: brightness(1.4); }
+  }
+
+  /* 🎨 Efecto de cambio de color neón */
+  @keyframes colorShift {
+    0% { color: #ff99ff; text-shadow: 0 0 15px #ff66ff, 0 0 40px #cc33ff; }
+    25% { color: #99ccff; text-shadow: 0 0 15px #66ccff, 0 0 40px #3399ff; }
+    50% { color: #b3ffcc; text-shadow: 0 0 15px #66ffcc, 0 0 40px #00ffaa; }
+    75% { color: #ffd6a5; text-shadow: 0 0 15px #ff9966, 0 0 40px #ff6600; }
+    100% { color: #ff99ff; text-shadow: 0 0 15px #ff66ff, 0 0 40px #cc33ff; }
+  }
+
+  /* 🔊 Botón música */
+  #playMusic {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: rgba(255, 102, 204, 0.2);
+    border: 1px solid #ff99ff;
+    color: #fff;
+    font-size: 16px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+    z-index: 1000;
+  }
+
+  #playMusic:hover {
+    background: rgba(255, 102, 204, 0.4);
+    transform: scale(1.05);
+  }
+
+  /* 🌈 Auroras */
+  .aurora {
+    position: absolute;
+    width: 120%;
+    height: 200px;
+    top: -100px;
+    left: -10%;
+    background: linear-gradient(90deg, rgba(0,255,255,0.1), rgba(255,0,255,0.1), rgba(0,255,255,0.1));
+    filter: blur(70px);
+    animation: floatAurora 10s ease-in-out infinite alternate;
+  }
+
+  @keyframes floatAurora {
+    0% { transform: translateY(0px); opacity: 0.4; }
+    100% { transform: translateY(80px); opacity: 0.7; }
+  }
+
+  /* 💗 Nombre flotante */
+  .nombre-flotante {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3em;
+    color: #ff99ff;
+    text-shadow: 0 0 25px #ff33ff, 0 0 50px #cc00cc, 0 0 80px #ff66ff;
+    animation: aparecerDesaparecer 6s ease-in-out forwards;
+    pointer-events: none;
+  }
+
+  @keyframes aparecerDesaparecer {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+    20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    70% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
+  }
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<canvas id="galaxy"></canvas>
+<div class="nombre-flotante">Para pollito 💫</div>
+<button id="playMusic">🎵 Activar música</button>
+
+<script>
+const canvas = document.getElementById('galaxy');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let stars = [];
+let shootingStars = [];
+let nebula = [];
+let constellations = [];
+
+function random(min, max) { return Math.random() * (max - min) + min; }
+
+// ⭐ Estrellas
+for (let i = 0; i < 500; i++) {
+  const colors = ['#ffffff', '#ffb3ff', '#b3e0ff'];
+  stars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    radius: Math.random() * 1.5,
+    alpha: random(0.3, 1),
+    flicker: random(0.002, 0.008),
+    color: colors[Math.floor(Math.random() * colors.length)]
+  });
+}
+
+// ☁️ Neblina
+for (let i = 0; i < 70; i++) {
+  nebula.push({
+    x: Math.random() * canvas.width - canvas.width / 2,
+    y: Math.random() * canvas.height - canvas.height / 2,
+    size: random(150, 400),
+    color: `hsla(${random(260, 310)}, 100%, ${random(55, 75)}%, ${random(0.05, 0.25)})`,
+    drift: random(0.0003, 0.001)
+  });
+}
+
+// 🌟 Constelaciones
+function crearConstelacion() {
+  const estrellas = [];
+  for (let i = 0; i < 6; i++) {
+    estrellas.push({
+      x: random(100, canvas.width - 100),
+      y: random(100, canvas.height - 100)
+    });
+  }
+  constellations.push({ estrellas, vida: 1 });
+}
+setInterval(crearConstelacion, 12000);
+
+let angle = 0;
+let zoom = 1;
+
+// ✨ Dibujo
+function draw() {
+  ctx.fillStyle = "rgba(5, 0, 15, 0.25)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  zoom = 1 + Math.sin(Date.now() * 0.0003) * 0.02;
+  ctx.save();
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  ctx.scale(zoom, zoom);
+  ctx.rotate(angle);
+  angle += 0.0004;
+
+  for (let n of nebula) {
+    n.x += Math.sin(Date.now() * n.drift) * 0.1;
+    n.color = `hsla(${(Date.now() / 100 + n.x / 10) % 360}, 100%, 60%, ${random(0.05, 0.25)})`;
+    const gradient = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.size);
+    gradient.addColorStop(0, n.color);
+    gradient.addColorStop(1, "transparent");
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+
+  for (let s of stars) {
+    s.alpha += s.flicker * (Math.random() < 0.5 ? -1 : 1);
+    s.alpha = Math.max(0.3, Math.min(1, s.alpha));
+    const glow = Math.sin(Date.now() * 0.002 + s.x) * 0.3 + 1;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.radius * glow, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${hexToRgb(s.color)},${s.alpha})`;
+    ctx.fill();
+  }
+
+  if (Math.random() < 0.004) {
+    shootingStars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * (canvas.height / 2),
+      dx: random(10, 14),
+      dy: random(4, 7),
+      len: random(80, 120),
+      life: 1
+    });
+  }
+
+  for (let s of shootingStars) {
+    ctx.beginPath();
+    ctx.moveTo(s.x, s.y);
+    ctx.lineTo(s.x - s.len, s.y - s.len / 2);
+    ctx.strokeStyle = `rgba(255,255,255,${s.life})`;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    s.x += s.dx;
+    s.y += s.dy;
+    s.life -= 0.01;
+  }
+
+  for (let c of constellations) {
+    ctx.beginPath();
+    for (let i = 0; i < c.estrellas.length - 1; i++) {
+      ctx.moveTo(c.estrellas[i].x, c.estrellas[i].y);
+      ctx.lineTo(c.estrellas[i + 1].x, c.estrellas[i + 1].y);
+    }
+    ctx.strokeStyle = `rgba(255,200,255,${c.vida})`;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    c.vida -= 0.003;
+  }
+  constellations = constellations.filter(c => c.vida > 0);
+
+  requestAnimationFrame(draw);
+}
+draw();
+
+
+// 💖 Corazones
+function createHeart() {
+  const heart = document.createElement('div');
+  heart.className = 'heart';
+  heart.textContent = '❤';
+  heart.style.left = random(0, window.innerWidth - 20) + 'px';
+  heart.style.top = random(0, window.innerHeight - 20) + 'px';
+  heart.style.animationDuration = random(3, 5) + 's';
+  heart.style.color = `hsl(${random(300, 360)},100%,70%)`;
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 4000);
+}
+setInterval(createHeart, 500);
+
+
+// 💬 Frases románticas flotantes
+const frases = [
+  "Eres mi universo favorito 🌌","Brillas más que todas las estrellas ✨",
+  "Mi corazón orbita alrededor del tuyo 💖","Nuestro amor es infinito ♾️",
+  "Tu mirada tiene su propia galaxia 💫","Cada latido lleva tu nombre 💕",
+  "Entre millones de estrellas, te elegí a ti 🌠","Tu amor ilumina mi cielo oscuro 💜",
+  "Eres la constelación que guía mis noches 🌙","Sin ti, mi mundo se apaga 🪐",
+  "Te pienso hasta en las estrellas fugaces 💫","Tu amor me hace flotar sin gravedad 💫",
+  "Entre todos te vi a ti 💘","Alegras mis días ☀️",
+  "Eres mi luz incluso en la noche más oscura 🌙","Te amo con todo mi ser 💖",
+  "Eres mi bebita 🧸","Eres mi pollito 🐥",
+  "Eres mi peque 💕","Eres mi princesa 👑",
+  "Gracias por ser lo que eres ✨","Nunca cambies 💫",
+  "Mi alma sonríe cuando escucho tu nombre 💞","Eres la razón por la que mi cielo siempre tiene estrellas ✨",
+  "No necesito magia, ya te tengo a ti 💕","Eres mi refugio en este universo infinito 🌌",
+  "Si pudiera pedir un deseo, siempre serías tú 🌠","Tus abrazos son mi lugar favorito 💗",
+  "Cuando sonríes, el universo se ilumina 🔮","Eres mi poema favorito hecho persona 💖",
+  "Nada brilla tanto como tu mirada 💫","En tu amor encontré mi galaxia perfecta 🌈"
+];
+
+function mostrarFrase() {
+  const frase = document.createElement('div');
+  frase.className = 'phrase';
+  frase.textContent = frases[Math.floor(Math.random() * frases.length)];
+  frase.style.left = random(50, window.innerWidth - 350) + 'px';
+  frase.style.top = random(50, window.innerHeight - 150) + 'px';
+  document.body.appendChild(frase);
+  setTimeout(() => frase.remove(), 7000);
+}
+setInterval(mostrarFrase, 5000);
+
+// 🎵 Música
+const botonMusica = document.getElementById('playMusic');
+let musica;
+
+function activarMusica() {
+  if (!musica) {
+    musica = new Audio('up.mp3');
+    musica.loop = true;
+    musica.volume = 0.6;
+    musica.play();
+  }
+  botonMusica.style.display = 'none';
+}
+botonMusica.addEventListener('click', activarMusica);
+
+// 🎨 Conversión hex a RGB
+function hexToRgb(hex) {
+  hex = hex.replace('#', '');
+  const bigint = parseInt(hex, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `${r},${g},${b}`;
+}
+</script>
+</body>
+</html>
